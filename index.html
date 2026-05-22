@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forever Aloe Vera - Interaktif</title>
+<style>
+  /* Reset & Base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    background: #f2f8f3;
+    color: #2c3e25;
+  }
+  header {
+    background: #386641;
+    color: #e0f0db;
+    padding: 30px 15px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  header h1 {
+    margin: 0 0 10px;
+    font-weight: 900;
+  }
+  header p {
+    font-weight: 600;
+    font-size: 1.15em;
+  }
+  main {
+    max-width: 1200px;
+    margin: 20px auto 60px;
+    padding: 0 15px;
+  }
+
+  /* Filter Buttons */
+  .filter-group {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  .filter-group button {
+    border: none;
+    background: #a3c293;
+    color: #2c3e25;
+    font-weight: 600;
+    padding: 10px 18px;
+    margin: 0 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .filter-group button.active,
+  .filter-group button:hover {
+    background: #386641;
+    color: #e0f0db;
+  }
+
+  /* Products Grid */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 25px;
+  }
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+  }
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  }
+  .product-card img {
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+  .product-name {
+    font-weight: 800;
+    font-size: 1.2em;
+    margin-bottom: 6px;
+    color: #2a4a2a;
+  }
+  .product-flavor {
+    font-style: italic;
+    font-size: 0.9em;
+    margin-bottom: 12px;
+    color: #5a7d5a;
+  }
+  .product-description {
+    flex-grow: 1;
+    font-size: 0.95em;
+    line-height: 1.4;
+    color: #3f593f;
+  }
+  .sugar-label {
+    margin-top: 15px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 18px;
+    display: inline-block;
+    font-size: 0.85em;
+    color: white;
+  }
+  /* Sugar level colors */
+  .very-low { background-color: #2f7a2f; }
+  .low { background-color: #a0c55f; color: #2f3e2f; }
+  .medium { background-color: #f0a500; }
+  .high { background-color: #d62828; }
+
+  /* Popup Modal */
+  .modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    z-index: 100;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: white;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    position: relative;
+    text-align: center;
+  }
+  .modal-content img {
+    max-width: 80%;
+    margin-bottom: 20px;
+    border-radius: 10px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px; right: 18px;
+    font-size: 1.7em;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .modal-close:hover {
+    color: #d62828;
+  }
+  .modal-title {
+    font-weight: 900;
+    font-size: 1.6em;
+    margin-bottom: 12px;
+    color: #2a4a2a;
+  }
+  .modal-text {
+    font-size: 1em;
+    line-height: 1.5;
+    color: #3f593f;
+  }
+
+  footer {
+    background: #384a21;
+    color: #d3deb6;
+    text-align: center;
+    padding: 20px 15px;
+    font-size: 0.9em;
+    position: fixed;
+    bottom: 0; left: 0; right:0;
+  }
+
+  @media (max-width: 480px) {
+    .product-card {
+      padding: 12px;
+    }
+    header h1 {
+      font-size: 1.3em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Forever Aloe Vera Drinks</h1>
+  <p><strong>Pure Aloe Vera &middot; No Added Sugar* &middot; No Artificial Colors</strong></p>
+</header>
+
+<main>
+  <section class="filter-group" aria-label="Filter Products by Sugar Level">
+    <button class="filter-btn active" data-filter="all" aria-pressed="true">Tampilkan Semua</button>
+    <button class="filter-btn" data-filter="very-low" aria-pressed="false">Very Low Sugar</button>
+    <button class="filter-btn" data-filter="low" aria-pressed="false">Low Sugar</button>
+    <button class="filter-btn" data-filter="medium" aria-pressed="false">Medium Sugar</button>
+    <button class="filter-btn" data-filter="high" aria-pressed="false">High Sugar</button>
+  </section>
+
+  <section class="products-grid" aria-live="polite" aria-label="Produk Aloe Vera">
+
+    <!-- Product 1 -->
+    <article class="product-card" data-sugar="very-low" tabindex="0" role="button" aria-describedby="desc-1">
+      <img src="ALOE VERA NORMAL.png" alt="Forever Aloe Vera Gel" />
+      <h2 class="product-name">Forever Aloe Vera Gel</h2>
+      <p class="product-flavor">No added preservatives</p>
+      <p class="product-description" id="desc-1">Mendukung pencernaan &amp; kesehatan menyeluruh.</p>
+      <span class="sugar-label very-low" aria-label="Very Low Sugar Level">Very Low Sugar</span>
+    </article>
+
+    <!-- Product 2 -->
+    <article class="product-card" data-sugar="low" tabindex="0" role="button" aria-describedby="desc-2">
+      <img src="ALOE BERRY NECTAR.png" alt="Forever Aloe Berry Nectar" />
+      <h2 class="product-name">Forever Aloe Berry Nectar</h2>
+      <p class="product-flavor">Cranberry-apple flavored Aloe Vera Gel</p>
+      <p class="product-description" id="desc-2">Mendukung imun dengan antioksidan.</p>
+      <span class="sugar-label low" aria-label="Low Sugar Level">Low Sugar</span>
+    </article>
+
+    <!-- Product 3 -->
+    <article class="product-card" data-sugar="medium" tabindex="0" role="button" aria-describedby="desc-3">
+      <img src="ALOE PEACHES.png" alt="Forever Aloe Peaches" />
+      <h2 class="product-name">Forever Aloe Peaches</h2>
+      <p class="product-flavor">Peach flavored Aloe Vera Gel</p>
+      <p class="product-description" id="desc-3">Mendukung kesehatan &amp; hidrasi.</p>
+      <span class="sugar-label medium" aria-label="Medium Sugar Level">Medium Sugar</span>
+    </article>
+
+    <!-- Product 4 -->
+    <article class="product-card" data-sugar="very-low" tabindex="0" role="button" aria-describedby="desc-4">
+      <img src="ALOE FREEDOM.png" alt="Forever Freedom" />
+      <h2 class="product-name">Forever Freedom</h2>
+      <p class="product-flavor">Orange flavored Aloe Vera Juice</p>
+      <p class="product-description" id="desc-4">Mendukung kesehatan &amp; mobilitas.</p>
+      <span class="sugar-label very-low" aria-label="Very Low Sugar Level">Very Low Sugar</span>
+    </article>
+
+    <!-- Product 5 -->
+    <article class="product-card" data-sugar="high" tabindex="0" role="button" aria-describedby="desc-5">
+      <img src="ALOE POMEGRANATE.png" alt="Forever Aloe Pomegranate" />
+      <h2 class="product-name">Forever Aloe Pomegranate</h2>
+      <p class="product-flavor">Pomegranate flavored Aloe Vera Gel</p>
+      <p class="product-description" id="desc-5">Rich in antioxidants &amp; vitamin C.</p>
+      <span class="sugar-label high" aria-label="High Sugar Level">High Sugar</span>
+    </article>
+
+  </section>
+</main>
+
+<!-- Popup Modal -->
+<div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+  <div class="modal-content">
+    <span class="modal-close" role="button" aria-label="Close popup">&times;</span>
+    <img src="" alt="" id="modal-img" />
+    <h3 id="modal-title"></h3>
+    <p id="modal-desc"></p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2024 Forever Living Products | <a href="mailto:info@foreveraloe.com" style="color:#d3deb6;">info@foreveraloe.com</a> | <a href="https://www.foreverliving.com/" target="_blank" rel="noopener" style="color:#d3deb6;">www.foreverliving.com</a></p>
+</footer>
+
+<script>
+  // Filter Buttons
+  const filterButtons = document.querySelectorAll('.filter-btn');
+  const productCards = document.querySelectorAll('.product-card');
+
+  filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Update active style & aria-pressed
+      filterButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', "false");
+      });
+      button.classList.add('active');
+      button.setAttribute('aria-pressed', "true");
+
+      const filter = button.getAttribute('data-filter');
+
+      productCards.forEach(card => {
+        if(filter === 'all' || card.dataset.sugar === filter) {
+          card.style.display = 'flex';
+          card.setAttribute('tabindex', '0');
+        } else {
+          card.style.display = 'none';
+          card.setAttribute('tabindex', '-1');
+        }
+      });
+    });
+  });
+
+  // Modal Popup for product details
+  const modal = document.querySelector('.modal');
+  const modalImg = document.getElementById('modal-img');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDesc = document.getElementById('modal-desc');
+  const closeBtn = document.querySelector('.modal-close');
+
+  productCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const imgSrc = card.querySelector('img').src;
+      const imgAlt = card.querySelector('img').alt;
+      const title = card.querySelector('.product-name').textContent;
+      const desc = card.querySelector('.product-description').textContent;
+      
+      modalImg.src = imgSrc;
+      modalImg.alt = imgAlt;
+      modalTitle.textContent = title;
+      modalDesc.textContent = desc;
+
+      modal.classList.add('active');
+      // Set focus inside modal for accessibility
+      closeBtn.focus();
+    });
+
+    // Support keyboard enter key to open modal
+    card.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+
+  // Close modal function
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+  modal.addEventListener('click', e => {
+    if(e.target === modal) {
+      modal.classList.remove('active');
+    }
+  });
+
+  // Close modal on ESC key
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && modal.classList.contains('active')) {
+      modal.classList.remove('active');
+    }
+  });
+</script>
+
+</body>
+</html>
